@@ -497,8 +497,173 @@
         }
 
 
+
+// gerenciamento do checkout
+        function renderCheckout() {
+            loadTemplate('checkout-template');
+            setTimeout(() => {
+                const subtotalEl = document.getElementById('checkout-subtotal');
+                const totalEl = document.getElementById('checkout-total');
+                let subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const shipping = 15.00;
+                const total = subtotal + shipping;
+                subtotalEl.textContent = `R$ ${subtotal.toFixed(2)}`;
+                totalEl.textContent = `R$ ${total.toFixed(2)}`;
+
+                const checkoutForm = document.getElementById('checkout-form');
+                checkoutForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (cart.length === 0) {
+                        alert('Seu carrinho está vazio.');
+                        return;
+                    }
+                    alert('Compra finalizada com sucesso!');
+                    cart = [];
+                    saveCart();
+                    loadTemplate('catalog-template');
+                    document.querySelector('.nav-link[data-page="catalog"]').classList.add('active');
+                });
+            }, 50);
+        }
+
+// autenticação email
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = { name: user.name, email: user.email };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUserInterface();
+                loadTemplate('catalog-template');
+                document.querySelector('.nav-link[data-page="catalog"]').classList.add('active');
+            } else {
+                emailError.style.display = 'block';
+                passwordError.style.display = 'block';
+            }
+        }
+
+        function handleCadastro(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const nameError = document.getElementById('reg-name-error');
+            const emailError = document.getElementById('reg-email-error');
+            const passwordError = document.getElementById('reg-password-error');
+
+            nameError.style.display = 'none';
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+
+            if (!name) {
+                nameError.style.display = 'block';
+                return;
+            }
+            if (users.some(u => u.email === email)) {
+                emailError.style.display = 'block';
+                return;
+            }
+            if (password.length < 6) {
+                passwordError.style.display = 'block';
+                return;
+            }
+
+            users.push({ name, email, password });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Cadastro realizado com sucesso! Faça login para continuar.');
+            loadTemplate('login-template');
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            updateUserInterface();
+            loadTemplate('catalog-template');
+            document.querySelector('.nav-link[data-page="catalog"]').classList.add('active');
+        }
+
+
+
+
+        function initApp() {
+            updateUserInterface();
+            loadTemplate('catalog-template');
+
+
+
+
+// adição ao carrinho
+            document.addEventListener('click', (e) => {
+                handleNavigation(e);
+                if (e.target.classList.contains('buy-button')) {
+                    const title = e.target.dataset.title;
+                    const price = parseFloat(e.target.dataset.price);
+                    const existingProduct = cart.find(item => item.title === title);
+                    if (existingProduct) {
+                        existingProduct.quantity += 1;
+                    } else {
+                        cart.push({ title, price, quantity: 1 });
+                    }
+                    saveCart();
+                    alert(`${title} adicionado ao carrinho!`);
+                }
+                if (e.target.id === 'logout') {
+                    handleLogout();
+                }
+            });
+
+
+
+
+
+// funcionalidade de pesquisa de produto
+            const searchForm = document.getElementById('searchForm');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('searchInput');
+                    const searchTerm = searchInput.value.trim().toLowerCase();
+                    if (!searchTerm) {
+                        alert('Digite algo para buscar!');
+                        return;
+                    }
+                    loadTemplate('catalog-template');
+                    setTimeout(() => {
+                        const products = document.querySelectorAll('.product-card');
+                        products.forEach(product => {
+                            const title = product.querySelector('.card-title').textContent.toLowerCase();
+                            const description = product.querySelector('.card-text').textContent.toLowerCase();
+                            product.parentElement.style.display = (title.includes(searchTerm) || description.includes(searchTerm)) ? 'block' : 'none';
+                        });
+                    }, 100);
+                });
+
+                const clearBtn = document.getElementById('clearSearch');
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', () => {
+                        document.getElementById('searchInput').value = '';
+                        loadTemplate('catalog-template');
+                    });
+                }
+            }
+
+
+        
+            document.addEventListener('submit', (e) => {
+                if (e.target.id === 'login-form') {
+                    handleLogin(e);
+                } else if (e.target.id === 'cadastro-form') {
+                    handleCadastro(e);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
-
-
 </body>
 </html>
