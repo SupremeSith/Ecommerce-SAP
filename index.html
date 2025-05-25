@@ -390,7 +390,7 @@
             container.appendChild(template.content.cloneNode(true));
         }
 
-// navigação
+// navegação
         function handleNavigation(e) {
             const page = e.target.dataset.page;
             if (page) {
@@ -413,6 +413,90 @@
                 }
             }
         }
+
+
+// updates na interface do cliente
+        function updateUserInterface() {
+            const userMenu = document.getElementById('userName');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (currentUser) {
+                userMenu.textContent = `Olá, ${currentUser.name}!`;
+                dropdownMenu.innerHTML = `
+                    <li><a class="dropdown-item" href="#" id="logout">Sair</a></li>
+                `;
+            } else {
+                userMenu.textContent = 'Olá, Visitante!';
+                dropdownMenu.innerHTML = `
+                    <li><a class="dropdown-item" href="#" data-page="login">Login</a></li>
+                    <li><a class="dropdown-item" href="#" data-page="cadastro">Registrar</a></li>
+                `;
+            }
+        }
+
+// gerenciamento carrinho
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function renderCart() {
+            loadTemplate('cart-template');
+            setTimeout(() => {
+                const cartBody = document.getElementById('cart-body');
+                const subtotalEl = document.getElementById('cart-subtotal');
+                cartBody.innerHTML = '';
+                let subtotal = 0;
+
+                cart.forEach(item => {
+                    const total = item.price * item.quantity;
+                    subtotal += total;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.title}</td>
+                        <td>R$ ${item.price.toFixed(2)}</td>
+                        <td><input type="number" class="form-control quantity-input" data-title="${item.title}" value="${item.quantity}" min="1"></td>
+                        <td>R$ ${total.toFixed(2)}</td>
+                        <td><button class="btn btn-danger btn-sm remove-item" data-title="${item.title}">Remover</button></td>
+                    `;
+                    cartBody.appendChild(row);
+                });
+
+                subtotalEl.textContent = subtotal.toFixed(2);
+                attachCartListeners();
+            }, 50);
+        }
+
+        function attachCartListeners() {
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const title = this.dataset.title;
+                    const newQuantity = parseInt(this.value);
+                    const product = cart.find(item => item.title === title);
+                    if (product && newQuantity >= 1) {
+                        product.quantity = newQuantity;
+                        saveCart();
+                        renderCart();
+                    }
+                });
+            });
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const title = this.dataset.title;
+                    cart = cart.filter(item => item.title !== title);
+                    saveCart();
+                    renderCart();
+                });
+            });
+            document.getElementById('proceed-to-checkout')?.addEventListener('click', () => {
+                if (!currentUser) {
+                    alert('Faça login para prosseguir ao checkout.');
+                    loadTemplate('login-template');
+                } else {
+                    renderCheckout();
+                }
+            });
+        }
+
+
     </script>
 
 
