@@ -41,7 +41,40 @@
     </style>
 </head>
 <body>
+    <!-- HEADER SECTION -->
+    <header>
+        <section class="header-main py-3 bg-orange">
+            <div class="container">
+                <div class="row align-items-center g-3">
+                    <div class="col-lg-3">
+                        <img src="img/BIKES.png" alt="Logo" class="img-fluid" style="height: 150px;"/>
+                    </div>
+                    <div class="col-lg-6">
+                        <form id="searchForm" class="d-flex">
+                            <input type="search" class="form-control" placeholder="Localizar produtos" id="searchInput" />
+                            <button class="btn btn-primary ms-2">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <button type="button" class="btn btn-secondary ms-2" id="clearSearch">
+                                Limpar
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="dropdown text-end">
+                            <a href="#" class="text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" id="userMenu">
+                                <i class="fas fa-user me-2"></i><span id="userName">Olá, Visitante!</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" id="dropdownMenu">
+                                <li><a class="dropdown-item" href="#" data-page="login">Login</a></li>
+                                <li><a class="dropdown-item" href="#" data-page="cadastro">Registrar</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </header>
 
-    <h1>estilização inicial</h1>
 </body>
 </html>
