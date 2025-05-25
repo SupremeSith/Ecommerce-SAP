@@ -89,3 +89,7 @@ Menus, cards de produtos e formulários se adaptam automaticamente ao tamanho da
   Este projeto é um protótipo e não implementa criptografia de senhas ou validações avançadas.
 
 ---
+
+- **Link Aplicação**
+- https://earthy-supreme-mail.glitch.me
+
